@@ -1,10 +1,35 @@
 version: "3"
 services:
+  # db:
+  #   image: mysql:8.0
+  #   command: mysqld --character-set-server=UTF8MB4 
+  #   environment:
+  #     MYSQL_DATABASE: database
+  #     MYSQL_USER: user
+  #     MYSQL_PASSWORD: password
+  #     MYSQL_ROOT_PASSWORD: password
+  #   volumes:
+  #     - ./db/data:/var/lib/mysql
+  #     - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+  #     - ./db/sql:/docker-entrypoint-initdb.d
+  #   ports:
+  #     - 3306:3306
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: database
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - '3316:3306'
+    volumes:
+      - ./db:/var/lib/mysql
   app:
     build: ./app
     command: bundle exec ruby app.rb -o 0.0.0.0
     ports:
-      - "4567:4567"
+      - 4567:4567
     volumes:
       - ./app:/app
-
+    depends_on:
+      - db
