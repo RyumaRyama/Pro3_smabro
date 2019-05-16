@@ -9,3 +9,6 @@ get "/hello" do
   "This is a new contents."
 end
 
+get "/akari" do
+  '\ｱｯｶﾘ~ﾝ/ '*1000
+end
