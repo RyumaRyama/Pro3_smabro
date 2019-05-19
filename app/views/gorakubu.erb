@@ -1,9 +1,14 @@
 <link rel="stylesheet" href="/css/stylesheet.css">
 
-<h1>HELLO <span>GORAKUBU</span> WORLD</h1>
-<ul>
-<% @users.each do |user| %>
-  <li><%= user %></li>
-<% end %>
-</ul>
+<header>
+  <div class="yryr1">ゆるゆり</div>
+  <div class="yryr2">Y☆R☆Y☆R☆</div>
+</header>
 
+<div class="member">
+  <% @users.each do |user| %>
+    <a class="character-box" href="gorakubu/<%= user %>">
+      <%= user %>
+    </a>
+  <% end %>
+</div>
