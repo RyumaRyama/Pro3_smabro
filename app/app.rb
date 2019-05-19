@@ -12,3 +12,8 @@ end
 get "/akari" do
   '\ｱｯｶﾘ~ﾝ/ '*1000
 end
+
+get "/gorakubu" do
+  @users = ["akari", "kyoko", "yui", "chinatsu"]
+  erb :gorakubu
+end
