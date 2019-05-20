@@ -50,13 +50,3 @@ get '/akari' do
   '\ｱｯｶﾘ~ﾝ/ '*1000
 end
 
-# def connect_db_client
-#   Mysql2::Client.new(
-#     host: 'db',
-#     username: 'root',
-#     password: 'password',
-#     port: '3306',
-#     database: 'db'
-#   )
-# end
-
