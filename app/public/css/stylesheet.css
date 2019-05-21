@@ -1,0 +1,40 @@
+header{
+    height: 150px;
+    background-color: ffaaaa;
+    text-align: center;
+}
+
+header .yryr1 {
+    font-family: 'arial unicode ms';
+    color: #ffff00;
+    font-size: 60px;
+    padding-top: 25px;
+}
+
+header .yryr2 {
+    color: #fff;
+    font-size: 20px;
+    padding-left: 150px;
+}
+
+.member {
+    background-color: #000;
+    width: 70%;
+    margin: 0 auto;
+    margin-top: 100px;
+}
+
+.character-box {
+    text-decoration: none;
+    font-family: 'arial unicode ms';
+    text-transform: uppercase;
+    background-color: ffdddd;
+    font-size: 20px;
+    height: 100px;
+    width: 20%;
+    margin: 0 2.5%;
+    float: left;
+    text-align: center;
+    line-height: 100px;
+}
+
