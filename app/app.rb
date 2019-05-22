@@ -33,10 +33,8 @@ end
 
 get '/' do
   fuga = ''
-  # client = connect_db_client
-  client.query('SHOW TABLES').to_s
-  client.query('SELECT * FROM users').each do |hoge|
-    fuga += '<p>' + hoge['name'] + '</p>'
+  client.query('SELECT * FROM fighters').each do |hoge|
+    fuga += '<p>' + hoge['id'].to_s + ":" + hoge['name'] + '</p>'
   end
   fuga
   # 'Hello, from Docker. My Ruby version is: #{RUBY_VERSION}'
