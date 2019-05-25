@@ -1,12 +1,15 @@
 require 'sinatra'
 require 'sinatra/reloader'
-require 'mysql2'
+require 'pg'
 require 'socket'
+
+p ENV["PORT"]
+set :port, ENV["PORT"]
 
 # dbのポートにアクセスできたらtrueを返す
 def connecting_db
   begin
-  TCPSocket.open('db', 3306)
+  TCPSocket.open(ENV['POSTGRES_HOST'], 5432)
   rescue
     false
   else
@@ -19,32 +22,40 @@ while !connecting_db
   sleep 1
 end
 
-client = Mysql2::Client.new(
-  host: 'db',
-  username: 'root',
-  password: 'password',
-  port: '3306',
-  database: 'db'
+p ENV['POSTGRES_HOST']
+p ENV['POSTGRES_USER']
+p ENV['POSTGRES_PASSWORD']
+p ENV['POSTGRES_NAME']
+
+client = PG::connect(
+  host: ENV['POSTGRES_HOST'],
+  user: ENV['POSTGRES_USER'],
+  password: ENV['POSTGRES_PASSWORD'],
+  port: '5432',
+  dbname: ENV['POSTGRES_NAME']
 )
 
 # 一度だけ実行されるらしい
 configure do
+  client.exec("CREATE TABLE IF NOT EXISTS users (name TEXT);")
+  # client.exec("INSERT INTO users (name) SELECT '\ｱｯｶﾘ~ﾝ/';")
+  # client.exec("INSERT INTO users (name) SELECT 'Kyoko';")
+  # client.exec("INSERT INTO users (name) SELECT 'Yui';")
+  # client.exec("INSERT INTO users (name) SELECT 'Chinatsu';")
 end
 
 get '/' do
+  # '\ｱｯｶﾘ~ﾝ/ '*100
+  client.exec("INSERT INTO users (name) SELECT '\\ｱｯｶﾘ~ﾝ/';")
   fuga = ''
-  # client = connect_db_client
-  client.query('SHOW TABLES').to_s
   client.query('SELECT * FROM users').each do |hoge|
-    fuga += '<p>' + hoge['name'] + '</p>'
+    fuga += hoge['name'] + " "
   end
   fuga
-  # 'Hello, from Docker. My Ruby version is: #{RUBY_VERSION}'
 end
 
 get '/hello' do
-  'This is a new contents.'
-end
+  'This is a new contents.' end
 
 
 get "/gorakubu/akari" do
