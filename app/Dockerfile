@@ -7,4 +7,5 @@ WORKDIR /app
 RUN gem install bundler \
     && bundle install
 
-EXPOSE 4567
+# ARG PORT
+CMD ["bundle", "exec", "ruby", "app.rb", "-o", "0.0.0.0"]

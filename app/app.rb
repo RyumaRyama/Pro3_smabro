@@ -1,49 +1,39 @@
 require 'sinatra'
 require 'sinatra/reloader'
-require 'mysql2'
+require 'pg'
 require 'socket'
 
-# dbのポートにアクセスできたらtrueを返す
-def connecting_db
-  begin
-  TCPSocket.open('db', 3306)
-  rescue
-    false
-  else
-    true
-  end
-end
-
-# dbに繋げられる状態まで1秒ずつ待つ
-while !connecting_db
+begin
+  client = PG::connect(
+    host: ENV['POSTGRES_HOST'],
+    user: ENV['POSTGRES_USER'],
+    password: ENV['POSTGRES_PASSWORD'],
+    port: '5432',
+    dbname: ENV['POSTGRES_NAME']
+  )
+rescue
   sleep 1
+  retry
 end
-
-client = Mysql2::Client.new(
-  host: 'db',
-  username: 'root',
-  password: 'password',
-  port: '3306',
-  database: 'db'
-)
 
 # 一度だけ実行されるらしい
 configure do
+  client.exec("CREATE TABLE IF NOT EXISTS users (name TEXT);")
 end
 
 get '/' do
+  # '\ｱｯｶﾘ~ﾝ/ '*100
+  client.exec("INSERT INTO users (name) SELECT '\\ｱｯｶﾘ~ﾝ/';")
   fuga = ''
-  client.query('SELECT * FROM fighters').each do |hoge|
-    fuga += '<p>' + hoge['id'].to_s + ":" + hoge['name'] + '</p>'
+  client.query('SELECT * FROM users').each do |hoge|
+    fuga += hoge['name'] + " "
   end
   fuga
-  # 'Hello, from Docker. My Ruby version is: #{RUBY_VERSION}'
 end
 
 get '/hello' do
   'This is a new contents.'
 end
-
 
 get "/gorakubu/akari" do
   '\ｱｯｶﾘ~ﾝ/ '*1000

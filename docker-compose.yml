@@ -1,24 +1,21 @@
 version: "3"
 services:
   db:
-    image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: db
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: password
+    image: postgres:11
+    env_file: .env
     ports:
-      - '3306:3306'
+      - 5432:5432
     volumes:
-      - ./db/insert_data:/insert_data
-      - ./db/data:/var/lib/mysql
-      - ./db/initdb.d:/docker-entrypoint-initdb.d
-      - ./db/mysql_conf:/etc/mysql/conf.d
+      - ./db/data:/var/lib/postgresql/data
+      - ./db/initdb:/docker-entrypoint-initdb.d
   app:
     build: ./app
     command: bundle exec ruby app.rb -o 0.0.0.0
+    env_file: .env
     ports:
       - 4567:4567
     volumes:
       - ./app:/app
     depends_on:
       - db
+
