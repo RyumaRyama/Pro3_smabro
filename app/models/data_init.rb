@@ -21,13 +21,11 @@ end
 
 def insert_fighters(client)
   File.open(__FILE__[/(.*)data_init.rb/, 1]+"fighters", "r:utf-8") do |fighters|
-    id = 1
     fighters.each do |fighter|
       fighter.chomp!
       # fighterがinsertされてなければここで実行
       if client.exec("SELECT COUNT(*) AS count FROM fighters WHERE name = '#{fighter}'")[0]["count"].to_i <= 0
-        client.exec("INSERT INTO fighters (id, name) SELECT #{id}, '#{fighter}';")
-        id += 1
+        client.exec("INSERT INTO fighters (name) SELECT '#{fighter}';")
       end
     end
   end  
