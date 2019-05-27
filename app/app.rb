@@ -34,10 +34,16 @@ get '/' do
   # fuga
   # client.exec("INSERT INTO fighters (name) SELECT 'ｱｯｶﾘ~ﾝ';")
   fuga = ''
+  @fighters = {}
   client.query('SELECT * FROM fighters').each do |hoge|
+    @fighters[hoge['id']] = hoge["name"]
     fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
+    #fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
+    #fuga += "<p>" + @fighters[:hoge['id']] + "</p>"
+    #fuga += "<p>" + @fighters['1'] + "</p>"
   end
   fuga
+  erb :top
 end
 
 get '/hello' do
@@ -63,4 +69,8 @@ end
 get "/gorakubu" do
   @users = ["akari", "kyoko", "yui", "chinatsu"]
   erb :gorakubu
+end
+
+get "/1" do
+  'マリオ' * 100
 end
