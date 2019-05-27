@@ -3,6 +3,8 @@ require 'sinatra/reloader'
 require 'pg'
 require 'socket'
 
+require './models/data_init'
+
 begin
   client = PG::connect(
     host: ENV['POSTGRES_HOST'],
@@ -18,15 +20,22 @@ end
 
 # 一度だけ実行されるらしい
 configure do
-  client.exec("CREATE TABLE IF NOT EXISTS users (name TEXT);")
+  init_db(client)
+  insert_fighters(client)
 end
 
 get '/' do
   # '\ｱｯｶﾘ~ﾝ/ '*100
-  client.exec("INSERT INTO users (name) SELECT '\\ｱｯｶﾘ~ﾝ/';")
+  # client.exec("INSERT INTO users (name) SELECT '\\ｱｯｶﾘ~ﾝ/';")
+  # fuga = ''
+  # client.query('SELECT * FROM users').each do |hoge|
+  #   fuga += hoge['name'] + " "
+  # end
+  # fuga
+  # client.exec("INSERT INTO fighters (name) SELECT 'ｱｯｶﾘ~ﾝ';")
   fuga = ''
-  client.query('SELECT * FROM users').each do |hoge|
-    fuga += hoge['name'] + " "
+  client.query('SELECT * FROM fighters').each do |hoge|
+    fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
   end
   fuga
 end
