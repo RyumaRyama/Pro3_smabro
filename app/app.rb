@@ -25,24 +25,10 @@ configure do
 end
 
 get '/' do
-  # '\ｱｯｶﾘ~ﾝ/ '*100
-  # client.exec("INSERT INTO users (name) SELECT '\\ｱｯｶﾘ~ﾝ/';")
-  # fuga = ''
-  # client.query('SELECT * FROM users').each do |hoge|
-  #   fuga += hoge['name'] + " "
-  # end
-  # fuga
-  # client.exec("INSERT INTO fighters (name) SELECT 'ｱｯｶﾘ~ﾝ';")
-  # fuga = ''
-  @fighters = {}
-  client.query('SELECT * FROM fighters').each do |hoge|
-    @fighters[hoge['id']] = hoge["name"]
-    # fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
-    #fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
-    #fuga += "<p>" + @fighters[:hoge['id']] + "</p>"
-    #fuga += "<p>" + @fighters['1'] + "</p>"
+  @fighters = []
+  client.query('SELECT * FROM fighters').each do |data|
+    @fighters << data
   end
-  # fuga
   erb :top
 end
 
