@@ -25,19 +25,11 @@ configure do
 end
 
 get '/' do
-  # '\ｱｯｶﾘ~ﾝ/ '*100
-  # client.exec("INSERT INTO users (name) SELECT '\\ｱｯｶﾘ~ﾝ/';")
-  # fuga = ''
-  # client.query('SELECT * FROM users').each do |hoge|
-  #   fuga += hoge['name'] + " "
-  # end
-  # fuga
-  # client.exec("INSERT INTO fighters (name) SELECT 'ｱｯｶﾘ~ﾝ';")
-  fuga = ''
-  client.query('SELECT * FROM fighters').each do |hoge|
-    fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
+  @fighters = []
+  client.query('SELECT * FROM fighters').each do |data|
+    @fighters << data
   end
-  fuga
+  erb :top
 end
 
 get '/hello' do
@@ -63,4 +55,9 @@ end
 get "/gorakubu" do
   @users = ["akari", "kyoko", "yui", "chinatsu"]
   erb :gorakubu
+end
+
+get "/:fighter_id" do
+  fighter = client.exec("SELECT name FROM fighters WHERE id = #{params[:fighter_id]}")[0]["name"]
+  fighter.to_s * 100
 end
