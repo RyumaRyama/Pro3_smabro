@@ -33,16 +33,16 @@ get '/' do
   # end
   # fuga
   # client.exec("INSERT INTO fighters (name) SELECT 'ｱｯｶﾘ~ﾝ';")
-  fuga = ''
+  # fuga = ''
   @fighters = {}
   client.query('SELECT * FROM fighters').each do |hoge|
     @fighters[hoge['id']] = hoge["name"]
-    fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
+    # fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
     #fuga += "<p>" + hoge['id'] + ": " + hoge['name'] + " " + "</p>"
     #fuga += "<p>" + @fighters[:hoge['id']] + "</p>"
     #fuga += "<p>" + @fighters['1'] + "</p>"
   end
-  fuga
+  # fuga
   erb :top
 end
 
@@ -71,6 +71,7 @@ get "/gorakubu" do
   erb :gorakubu
 end
 
-get "/1" do
-  'マリオ' * 100
+get "/:fighter_id" do
+  fighter = client.exec("SELECT name FROM fighters WHERE id = #{params[:fighter_id]}")[0]["name"]
+  fighter.to_s * 100
 end
