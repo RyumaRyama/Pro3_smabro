@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="/css/stylesheet.css">
+
+<header>
+  <div class="yryr1"><%= @fighter %></div>
+  <div class="yryr2">S☆M☆B☆R☆</div>
+</header>
+
+<form action="<%=params[:fighter_id]%>/add_memo" method="POST">
+  memo:<br>
+  <textarea name="memo" rows="8" cols="80"></textarea>
+  <input type="submit" value="お願いします〜〜〜〜">
+</form>
+
+<% @fighter_memos.reverse_each do |memo| %>
+  <p><%= memo %></p>
+<% end %>

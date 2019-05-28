@@ -2,7 +2,7 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'pg'
 require 'socket'
-
+#require 'json'
 require './models/data_init'
 
 begin
@@ -71,4 +71,25 @@ post "/:fighter_id/add_memo" do
   memo = params[:memo]
   insert_fighters_memo(client,params[:fighter_id],memo)
   redirect  "/#{params[:fighter_id]}"
+end
+
+get "/test_api/:fighter" do
+  content_type :json
+  # fighterの存在確認
+  fighter_num = client.exec("SELECT COUNT(*) AS count FROM fighters WHERE name = '#{params[:fighter]}'")[0]["count"].to_i
+  if fighter_num > 0
+    return_data = {"message": "OK"}
+    sql = "SELECT notes.memo FROM notes \
+      INNER JOIN fighters \
+      ON notes.fighter_id = fighters.id \
+      WHERE fighters.name = '#{params[:fighter]}'"
+    fighter_memos = []
+    client.exec(sql).each do |memo|
+      fighter_memos << memo['memo']
+    end
+    return_data.store("memos",fighter_memos)
+  else
+    return_data = {"message": "ERROR: no data."}
+  end
+  return_data.to_json
 end
