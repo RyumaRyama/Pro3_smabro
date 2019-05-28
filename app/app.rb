@@ -58,6 +58,17 @@ get "/gorakubu" do
 end
 
 get "/:fighter_id" do
-  fighter = client.exec("SELECT name FROM fighters WHERE id = #{params[:fighter_id]}")[0]["name"]
-  fighter.to_s * 100
+  # insert_fighters_memo(client,params[:fighter_id])
+  @fighter = client.exec("SELECT name FROM fighters WHERE id = #{params[:fighter_id]}")[0]["name"]
+  @fighter_memos = []
+  client.exec("SELECT memo FROM notes WHERE fighter_id = #{params[:fighter_id]}").each do |memo|
+    @fighter_memos << memo['memo']
+  end
+  erb :fighters_show
+end
+
+post "/:fighter_id/add_memo" do
+  memo = params[:memo]
+  insert_fighters_memo(client,params[:fighter_id],memo)
+  redirect  "/#{params[:fighter_id]}"
 end
