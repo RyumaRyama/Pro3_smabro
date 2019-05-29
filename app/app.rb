@@ -76,20 +76,24 @@ end
 get "/test_api/:fighter" do
   content_type :json
   # fighterの存在確認
-  fighter_num = client.exec("SELECT COUNT(*) AS count FROM fighters WHERE name = '#{params[:fighter]}'")[0]["count"].to_i
+  count_sql = "SELECT COUNT(*) AS count FROM fighters \
+                WHERE name = '#{params[:fighter]}'"
+  fighter_num = client.exec(count_sql)[0]["count"].to_i
+
   if fighter_num > 0
-    return_data = {"message": "OK"}
+    return_data = {"result": true, "message": "OK"}
     sql = "SELECT notes.memo FROM notes \
-      INNER JOIN fighters \
-      ON notes.fighter_id = fighters.id \
-      WHERE fighters.name = '#{params[:fighter]}'"
+            INNER JOIN fighters \
+            ON notes.fighter_id = fighters.id \
+            WHERE fighters.name = '#{params[:fighter]}'"
     fighter_memos = []
     client.exec(sql).each do |memo|
       fighter_memos << memo['memo']
     end
-    return_data.store("memos",fighter_memos)
+    return_data.store("memos", fighter_memos)
   else
-    return_data = {"message": "ERROR: no data."}
+    return_data = {"result": false, "message": "ERROR: no data."}
   end
+
   return_data.to_json
 end
