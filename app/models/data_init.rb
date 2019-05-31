@@ -30,6 +30,12 @@ def insert_fighters(client)
         id += 1
       end
     end
-  end  
+  end
 end
 
+def insert_fighters_memo(client, fighter_id, memo)
+  memo.gsub!(/(^[[:space:]]+)|([[:space:]]+$)/, '')
+  if memo != ""
+    client.exec("INSERT INTO notes (fighter_id, memo) SELECT #{fighter_id}, '#{memo}';")
+  end
+end
