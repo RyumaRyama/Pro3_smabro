@@ -97,3 +97,7 @@ get "/test_api/:fighter" do
 
   return_data.to_json
 end
+
+def text_plane(text)
+  Rack::Utils.escape_html(text)
+end
