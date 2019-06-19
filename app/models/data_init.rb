@@ -25,8 +25,8 @@ def insert_fighters(client)
     fighters.each do |fighter|
       fighter.chomp!
       # fighterがinsertされてなければここで実行
-      if client.exec("SELECT COUNT(*) AS count FROM fighters WHERE name = '#{fighter}'")[0]["count"].to_i <= 0
-        client.exec("INSERT INTO fighters (id, name) SELECT #{id}, '#{fighter}';")
+      if client.exec_params("SELECT COUNT(*) AS count FROM fighters WHERE name = $1",[fighter])[0]["count"].to_i <= 0
+        client.exec_params("INSERT INTO fighters (id, name) SELECT $1, $2;",[id,fighter])
         id += 1
       end
     end
@@ -36,6 +36,6 @@ end
 def insert_fighters_memo(client, fighter_id, memo)
   memo.gsub!(/(^[[:space:]]+)|([[:space:]]+$)/, '')
   if memo != ""
-    client.exec("INSERT INTO notes (fighter_id, memo) SELECT #{fighter_id}, '#{memo}';")
+    client.exec_params("INSERT INTO notes (fighter_id, memo) SELECT $1, $2;",[fighter_id,memo])
   end
 end
