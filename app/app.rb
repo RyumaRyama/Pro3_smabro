@@ -59,9 +59,9 @@ end
 
 get "/:fighter_id" do
   # insert_fighters_memo(client,params[:fighter_id])
-  @fighter = client.exec("SELECT name FROM fighters WHERE id = #{params[:fighter_id]}")[0]["name"]
+  @fighter = client.exec_params("SELECT name FROM fighters WHERE id = $1",[params[:fighter_id]])[0]["name"]
   @fighter_memos = []
-  client.exec("SELECT memo FROM notes WHERE fighter_id = #{params[:fighter_id]}").each do |memo|
+  client.exec_params("SELECT memo FROM notes WHERE fighter_id = $1",[params[:fighter_id]]).each do |memo|
     @fighter_memos << memo['memo']
   end
   erb :fighters_show
@@ -77,17 +77,17 @@ get "/test_api/:fighter" do
   content_type :json
   # fighterの存在確認
   count_sql = "SELECT COUNT(*) AS count FROM fighters \
-                WHERE name = '#{params[:fighter]}'"
-  fighter_num = client.exec(count_sql)[0]["count"].to_i
+                WHERE name = $1"
+  fighter_num = client.exec_params(count_sql,[params[:fighter]])[0]["count"].to_i
 
   if fighter_num > 0
     return_data = {"result": true, "message": "OK"}
     sql = "SELECT notes.memo FROM notes \
             INNER JOIN fighters \
             ON notes.fighter_id = fighters.id \
-            WHERE fighters.name = '#{params[:fighter]}'"
+            WHERE fighters.name = $1"
     fighter_memos = []
-    client.exec(sql).each do |memo|
+    client.exec_params(sql,[params[:fighter]]).each do |memo|
       fighter_memos << memo['memo']
     end
     return_data.store("memos", fighter_memos)
