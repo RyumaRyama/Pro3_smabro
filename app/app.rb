@@ -97,3 +97,21 @@ get "/test_api/:fighter" do
 
   return_data.to_json
 end
+
+get '/test/new' do
+  erb :new
+end
+
+post '/test/create' do
+  sql = "INSERT INTO players (id, name, lineid, password) \
+  VALUES('#{params[:id]}', '#{params[:name]}', '#{params[:lineid]}', '#{params[:password]}',) "
+  redirect  "test/players/1"
+end
+
+get '/test/players/:id' do
+  @players = []
+  client.query("SELECT * FROM players WHERE id = '#{params[:id]}'").each do |player|
+    @players << player
+  end 
+  erb :player
+end
