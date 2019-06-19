@@ -4,6 +4,7 @@ require 'pg'
 require 'socket'
 #require 'json'
 require './models/data_init'
+require 'erb'
 
 begin
   client = PG::connect(
@@ -104,14 +105,12 @@ end
 
 post '/test/create' do
   sql = "INSERT INTO players (id, name, lineid, password) \
-  VALUES('#{params[:id]}', '#{params[:name]}', '#{params[:lineid]}', '#{params[:password]}',) "
-  redirect  "test/players/1"
+  VALUES(#{params[:id]},'#{params[:name]}', '#{params[:lineid]}', '#{params[:password]}')"
+  client.exec(sql)
+  redirect  "test/players/#{params[:id]}"
 end
 
 get '/test/players/:id' do
-  @players = []
-  client.query("SELECT * FROM players WHERE id = '#{params[:id]}'").each do |player|
-    @players << player
-  end 
+  @player = client.query("SELECT * FROM players WHERE id = #{params[:id]}")[0]
   erb :player
 end

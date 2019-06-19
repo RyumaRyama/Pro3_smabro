@@ -27,4 +27,4 @@ CREATE TABLE IF NOT EXISTS players (
   lineid TEXT NOT NULL,
   password TEXT NOT NULL,
   PRIMARY KEY (id)
-)
+);

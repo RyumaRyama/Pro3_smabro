@@ -1,6 +1,9 @@
-<% @players.each do |player| %>
-  <h1><%= player.name %></h1><br>
-  <p><%= player.id %></p><br>
-  <p><%= player.lineid %></p><br>
-<% end %>
+<h1>プレイヤーデータ</h1>
+
+
+<h1><%= @player["id"] %></h1><br>
+<h1><%= @player["name"] %></h1><br>
+<h1><%= @player["lineid"] %></h1><br>
+
+
 <p><a href="/">もどる</a></p>
