@@ -5,6 +5,8 @@ require 'socket'
 #require 'json'
 require './models/data_init'
 
+enable :sessions
+
 begin
   client = PG::connect(
     host: ENV['POSTGRES_HOST'],
@@ -18,10 +20,25 @@ rescue
   retry
 end
 
+lineid = "hoge"
+
 # 一度だけ実行されるらしい
 configure do
   init_db(client)
   insert_fighters(client)
+end
+
+get '/linebot' do
+  # session[:user_id]
+  lineid
+end
+
+post '/linebot' do
+  content_type :json
+  data = JSON.parse(request.body.read)
+  lineid = data["lineid"]
+  # session[:user_id] = data["lineid"]
+  session[:user_id] = "hogehogehoge"
 end
 
 get '/' do
@@ -29,7 +46,8 @@ get '/' do
   client.query('SELECT * FROM fighters').each do |data|
     @fighters << data
   end
-  erb :top
+  session[:user_id] = "none"
+  erb :fighters_index
 end
 
 get '/hello' do
