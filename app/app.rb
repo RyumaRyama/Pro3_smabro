@@ -5,7 +5,7 @@ require 'socket'
 #require 'json'
 require './helper.rb'
 require './models/data_init'
-
+=begin
 enable :sessions
 use Rack::Session::Cookie, :key => :user_id,
                            :expire_after => 600,
@@ -13,7 +13,7 @@ use Rack::Session::Cookie, :key => :user_id,
 # use Rack::Session::Cookie, :key => 'rack.session',
 #                            :expire_after => 600,
 #                            :secret => Digest::SHA256.hexdigest(rand.to_s)
-
+=end
 begin
   client = PG::connect(
     host: ENV['POSTGRES_HOST'],
@@ -50,17 +50,13 @@ post '/linebot' do
 end
 
 get '/' do
-  # if logged_in?
-  #   redirect '/fighters'
-  # end
-  # erb :top
-  redirect '/fighters'
+  erb :top
+  # redirect '/fighters'
 end
 
-# post '/login' do
-#   session[:user_id] = "hoge"
-#   redirect '/'
-# end
+get '/login' do
+  p params[:code]
+end
 
 get '/fighters' do
   @fighters = []
