@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="/css/stylesheet.css">
+
+<div class="member">
+  <% @fighters.each do |data| %>
+    <a class="character-box" href="/<%= data['id'] %>">
+      <%= data['name'] %>
+    </a>
+  <% end %>
+</div>

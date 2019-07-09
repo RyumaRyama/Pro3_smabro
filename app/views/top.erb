@@ -1,14 +1,4 @@
 <link rel="stylesheet" href="/css/stylesheet.css">
 
-<header>
-  <div class="yryr1">すまぶら</div>
-  <div class="yryr2">S☆M☆B☆R☆</div>
-</header>
-
-<div class="member">
-  <% @fighters.each do |data| %>
-    <a class="character-box" href="/<%= data['id'] %>">
-      <%= data['name'] %>
-    </a>
-  <% end %>
-</div>
+<!-- <a href="/login" action="post">Log in</a> -->
+<a href="https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=<%= ENV["CLIENT_ID"] %>&redirect_uri=<%= ENV["REDIRECT_URI"] %>&scope=<%= ENV["SCOPE"] %>&access_type=offline"> hoge </a>

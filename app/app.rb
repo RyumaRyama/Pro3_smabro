@@ -3,8 +3,17 @@ require 'sinatra/reloader'
 require 'pg'
 require 'socket'
 #require 'json'
+require './helper.rb'
 require './models/data_init'
-
+=begin
+enable :sessions
+use Rack::Session::Cookie, :key => :user_id,
+                           :expire_after => 600,
+                           :secret => Digest::SHA256.hexdigest(rand.to_s)
+# use Rack::Session::Cookie, :key => 'rack.session',
+#                            :expire_after => 600,
+#                            :secret => Digest::SHA256.hexdigest(rand.to_s)
+=end
 begin
   client = PG::connect(
     host: ENV['POSTGRES_HOST'],
@@ -18,43 +27,44 @@ rescue
   retry
 end
 
+lineid = "hoge"
+
 # 一度だけ実行されるらしい
 configure do
   init_db(client)
   insert_fighters(client)
 end
 
+get '/linebot' do
+  # session[:user_id]
+  session[:user_id] = nil
+  lineid
+end
+
+post '/linebot' do
+  content_type :json
+  data = JSON.parse(request.body.read)
+  lineid = data["lineid"]
+  # session[:user_id] = data["lineid"]
+  session[:user_id] = "hogehogehoge"
+end
+
 get '/' do
+  erb :top
+  # redirect '/fighters'
+end
+
+get '/login' do
+  p params[:code]
+end
+
+get '/fighters' do
   @fighters = []
   client.query('SELECT * FROM fighters').each do |data|
     @fighters << data
   end
-  erb :top
-end
-
-get '/hello' do
-  'This is a new contents.'
-end
-
-get "/gorakubu/akari" do
-  '\ｱｯｶﾘ~ﾝ/ '*1000
-end
-
-get "/gorakubu/kyoko" do
-  '\ｷｭｯﾋﾟ~ﾝ/ '*1000
-end
-
-get "/gorakubu/yui" do
-  '\ｵｲｺﾗ/ '*1000
-end
-
-get "/gorakubu/chinatsu" do
-  '\ｾﾝﾊﾟ~ｲ/ '*1000
-end
-
-get "/gorakubu" do
-  @users = ["akari", "kyoko", "yui", "chinatsu"]
-  erb :gorakubu
+  session[:user_id] = "none"
+  erb :fighters_index
 end
 
 get "/:fighter_id" do
@@ -100,4 +110,14 @@ end
 
 def text_plane(text)
   Rack::Utils.escape_html(text)
+end
+
+get '/test/linelogins' do
+  params[:code]
+end
+
+get '/test/callback' do
+  content_type :json
+  data = JSON.parse(request.body.read)
+  data["access_token"]
 end
