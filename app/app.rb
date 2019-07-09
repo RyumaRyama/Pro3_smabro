@@ -2,8 +2,11 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'pg'
 require 'socket'
-#require 'json'
+require 'net/http'
+require 'json'
 require './models/data_init'
+require 'uri'
+
 
 begin
   client = PG::connect(
@@ -60,11 +63,15 @@ end
 get "/:fighter_id" do
   # insert_fighters_memo(client,params[:fighter_id])
   @fighter = client.exec_params("SELECT name FROM fighters WHERE id = $1",[params[:fighter_id]])[0]["name"]
-  @fighter_memos = []
-  client.exec_params("SELECT memo FROM notes WHERE fighter_id = $1",[params[:fighter_id]]).each do |memo|
-    @fighter_memos << memo['memo']
+  if @fighter == "memo"
+    redirect "/test/googledrive"
+  else
+    @fighter_memos = []
+    client.exec_params("SELECT memo FROM notes WHERE fighter_id = $1",[params[:fighter_id]]).each do |memo|
+      @fighter_memos << memo['memo']
+    end
+    erb :fighters_show
   end
-  erb :fighters_show
 end
 
 post "/:fighter_id/add_memo" do
@@ -100,4 +107,36 @@ end
 
 def text_plane(text)
   Rack::Utils.escape_html(text)
+end
+
+get "/test/googledrive" do
+  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=アクセストークン")
+  redirect_url = Net::HTTP.get_response(URL)['location']
+  p redirect_url
+  response = Net::HTTP.get_response(URI.parse(redirect_url))
+  hash = JSON.parse(response.body)
+  #p hash["title"]
+  @title = hash["title"]
+  hash["title"] = "タイトリ"
+  str = JSON.generate(hash)
+
+
+  postUrl = "https://www.googleapis.com/upload/drive/v3/files/1G0P3Jv5qYkuZ7e5FUmcQmekUXoqu1ZP_?key=#{ENV['API_KEY']}"
+  uri = URI.parse(postUrl)
+  req = Net::HTTP::Patch.new(uri)
+  req["Content-Type"] = "application/json"
+  req["Accept"] = "application/json"
+  req["Authorization"] = "Bearer アクセストークン"
+  req.body = str
+
+
+  req_options = {
+    use_ssl: uri.scheme = "https"
+  }
+
+  response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+	   http.request(req)
+  end
+
+  p response
 end
