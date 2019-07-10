@@ -54,8 +54,37 @@ get '/' do
 end
 
 get '/login' do
-  p params[:code]
+  auth_code = request['code']
+
+  uri = URI.parse("https://www.googleapis.com/oauth2/v4/token")
+  request = Net::HTTP::Post.new(uri)
+  request.set_form_data(
+    "access_type" => "offline",
+    "client_id" => ENV['CLIENT_ID'],
+    "client_secret" => ENV['CLIENT_SECRET'],
+    "code" => auth_code,
+    "grant_type" => "authorization_code",
+    "redirect_uri" => ENV['REDIRECT_URI']
+  )
+  p request.body
+  req_options = {
+    use_ssl: uri.scheme == "https",
+  }
+
+  response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+    http.request(request)
+  end
+  p "-"*200
+  p response.body
+  response_data = JSON.parse(response.body)
+  session["access_token"] = response_data["access_token"]
+  redirect "/fighter"
 end
+
+get '/login_fin' do
+  p params
+end
+
 
 get '/fighters' do
   @fighters = []
