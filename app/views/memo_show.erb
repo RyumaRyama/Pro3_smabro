@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="/css/stylesheet.css">
+
+<h1><%= @title %></h1>
+
+<form action="/fighters/memo/update_memo" method="POST">
+  <textarea name="memo" rows="8" cols="80"><%= @memo %></textarea>
+  <input type="submit" value="更新">
+</form>
+
