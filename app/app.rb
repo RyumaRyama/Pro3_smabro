@@ -10,6 +10,9 @@ require 'uri'
 require './helper.rb'
 require './models/data_init'
 
+# sessionを有効化
+enable :sessions
+
 begin
   client = PG::connect(
     host: ENV['POSTGRES_HOST'],
@@ -113,31 +116,51 @@ def text_plane(text)
 end
 
 get "/fighters/memo" do
-  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=#{ACCESS_TOKEN}")
-  redirect_url = Net::HTTP.get_response(URL)['location']
-  p redirect_url
+  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=#{session[:access_token]}")
+  begin
+    redirect_url = Net::HTTP.get_response(URL)['location']
+  rescue
+    redirect "/"
+  end
   response = Net::HTTP.get_response(URI.parse(redirect_url))
-  hash = JSON.parse(response.body)
-  #p hash["title"]
-  @title = hash["title"]
-  hash["title"] = "タイトリ"
-  str = JSON.generate(hash)
+  session[:memo] = JSON.parse(response.body)
+  @title = session[:memo]["title"]
+  @memo = session[:memo]["cells"][0]["data"]
+  
+  erb :memo_show
+end
+
+def input_memo(memo)
+  session[:memo]["cells"][0]["data"] = memo
+end
+
+post "/fighters/memo/update_memo" do
+  input_memo(params[:memo])
+  str = JSON.generate(session[:memo])
 
   postUrl = "https://www.googleapis.com/upload/drive/v3/files/#{ENV['FILE_ID']}?key=#{ENV['API_KEY']}"
   uri = URI.parse(postUrl)
   req = Net::HTTP::Patch.new(uri)
   req["Content-Type"] = "application/json"
   req["Accept"] = "application/json"
-  req["Authorization"] = "Bearer #{ACCESS_TOKEN}"
+  req["Authorization"] = "Bearer #{session[:access_token]}"
   req.body = str
 
   req_options = {
     use_ssl: uri.scheme = "https"
   }
 
+  begin
   response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
 	   http.request(req)
   end
+  rescue
+    redirect "/"
+  end
 
+  p "-"*100
   p response
+  p "-"*100
+
+  redirect "/fighters/memo"
 end
