@@ -67,7 +67,7 @@ get "/:fighter_id" do
   # insert_fighters_memo(client,params[:fighter_id])
   @fighter = client.exec_params("SELECT name FROM fighters WHERE id = $1",[params[:fighter_id]])[0]["name"]
   if @fighter == "memo"
-    redirect "/test/googledrive"
+    redirect "/fighters/memo"
   else
     @fighter_memos = []
     client.exec_params("SELECT memo FROM notes WHERE fighter_id = $1",[params[:fighter_id]]).each do |memo|
@@ -112,8 +112,8 @@ def text_plane(text)
   Rack::Utils.escape_html(text)
 end
 
-get "/test/googledrive" do
-  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=アクセストークン")
+get "/fighters/memo" do
+  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=#{ACCESS_TOKEN}")
   redirect_url = Net::HTTP.get_response(URL)['location']
   p redirect_url
   response = Net::HTTP.get_response(URI.parse(redirect_url))
@@ -123,15 +123,13 @@ get "/test/googledrive" do
   hash["title"] = "タイトリ"
   str = JSON.generate(hash)
 
-
-  postUrl = "https://www.googleapis.com/upload/drive/v3/files/1G0P3Jv5qYkuZ7e5FUmcQmekUXoqu1ZP_?key=#{ENV['API_KEY']}"
+  postUrl = "https://www.googleapis.com/upload/drive/v3/files/#{ENV['FILE_ID']}?key=#{ENV['API_KEY']}"
   uri = URI.parse(postUrl)
   req = Net::HTTP::Patch.new(uri)
   req["Content-Type"] = "application/json"
   req["Accept"] = "application/json"
-  req["Authorization"] = "Bearer アクセストークン"
+  req["Authorization"] = "Bearer #{ACCESS_TOKEN}"
   req.body = str
-
 
   req_options = {
     use_ssl: uri.scheme = "https"
