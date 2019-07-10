@@ -10,6 +10,9 @@ require 'uri'
 require './helper.rb'
 require './models/data_init'
 
+# sessionを有効化
+enable :sessions
+
 begin
   client = PG::connect(
     host: ENV['POSTGRES_HOST'],
@@ -113,7 +116,8 @@ def text_plane(text)
 end
 
 get "/fighters/memo" do
-  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=#{ACCESS_TOKEN}")
+  session[:access_token] = ""
+  URL = URI.parse("https://www.googleapis.com/drive/v3/files/#{ENV['FILE_ID']}?alt=media&access_token=#{session[:access_token]}")
   redirect_url = Net::HTTP.get_response(URL)['location']
   p redirect_url
   response = Net::HTTP.get_response(URI.parse(redirect_url))
@@ -128,7 +132,7 @@ get "/fighters/memo" do
   req = Net::HTTP::Patch.new(uri)
   req["Content-Type"] = "application/json"
   req["Accept"] = "application/json"
-  req["Authorization"] = "Bearer #{ACCESS_TOKEN}"
+  req["Authorization"] = "Bearer #{session[:access_token]}"
   req.body = str
 
   req_options = {
